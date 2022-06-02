@@ -65,6 +65,7 @@ int bateaux[5] = { 2, 3, 3, 4, 5 };
 
 
 int bat[5][4] = {{ 33,33, 33,33},{ 50,50, 50,50},{ 60,60, 60,60},{ 70,70, 70,70},{ 80,80, 80,80}};
+int m = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -198,7 +199,12 @@ ecran(); // Affichage de l'ecran
               };
 
              if (valeurbouton == 0){
-              collision();
+              collision(i);
+              if (m==5){
+                valider=true;
+              }else{
+                m=0;
+              }
              }
       }
 
@@ -346,48 +352,36 @@ void ecran(){
     display.drawLine(bat[i][0], bat[i][1], bat[i][2], bat[i][3], myWHITE); 
   }      
 }
-void collision(){
-   int a = 0;
+void collision(int a){
    for (int i = 0; i<5; i++){
     if (valeurnuke == 0){
       if (i == a){
-        i++;
+        m++;
       }else{
-        if (bat[i][0] < pointX < bat[i][2] || (pointX == bat[i][0]-1 && pointY == bat[i][1]) || (pointX == bat[i][0]+1 && pointY == bat[i][1])){
-          if (bat[i][1]-1 < pointY < bat[i][3]+1){
+        if (bat[i][0]-1 < pointX < pointX+bateaux[a] < bat[i][2]+1 || bat[i][1]-1 < pointY < bat[i][3]+1){
             Serial.print("ligma balls");
             //placement impossible  
-          } else {
-            Serial.print("yoooooo");
-            valider=true;
-            a++;
-          }
         } else {
         Serial.print("Qu'est ce que sex ?");
         valider=true;
-        a++;
+        m++;
         }
       }
       
     }else{
       if (i == a){
-        i++;
+        m++;
       }else{
-        if (bat[i][1] < pointY < bat[i][3] || (pointY == bat[i][1]-1 && pointX == bat[i][0]) || (pointY == bat[i][1]+1 && pointX == bat[i][0])){
-          if (bat[i][0]-1 < pointX < bat[i][3]+1){
+        if (bat[i][1] < pointY < pointY+bateaux[a] < bat[i][3] || bat[i][0] < pointX < bat[i][2]){
             //placement impossible
-          } else {
-            valider=true;
-            a++;
-          }
         } else {
           valider=true;
-          a++;
+          m++;
         }
       }
     }
   }
-}  
+} 
  /* for (int i = 0; i<4; i++){
     display.drawCircle(18, 18, 2, myRED);
     delay(1000);
