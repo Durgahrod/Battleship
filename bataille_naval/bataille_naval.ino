@@ -1,7 +1,16 @@
-
 #define double_buffer
 #include <PxMatrix.h>
-
+//#include <EspMQTTClient.h>
+//EspMQTTClient client(
+//  "HewIOT",
+//  "H3xag0nePriv4te",
+//  "vd6db0fa.eu-central-1.emqx.cloud",  // MQTT Broker server ip
+//  "ESP32_C",   // Can be omitted if not needed
+//  "ESP32_C",   // Can be omitted if not needed
+//  "ESP32_C"      // Client name that uniquely identify your device
+//  18083 // The MQTT port
+//);
+//#include <PubSubClient.h>
 #ifdef ESP32
 
 #define P_LAT 22
@@ -68,19 +77,28 @@ int bat[5][4] = {{ 33,33, 33,33},{ 50,50, 50,50},{ 60,60, 60,60},{ 70,70, 70,70}
 int m = 0;
 
 void setup() {
+  
+  //Serial.println();
+  //Serial.print("ESP Board MAC Address: ");
+  //Serial.println(WiFi.macAddress());
+  Serial.begin(9600);
   // put your setup code here, to run once:
-Serial.begin(9600);
-  display.begin(16);
-  display.flushDisplay();
+  //client.enableDebuggingMessages();
+  //client.enableHTTPWebUpdater();
+  //client.enableOTA();
+  //client.enableLastWillMessage();
 
-  pinMode(25, INPUT);
+  //display.begin(16);
+  //display.flushDisplay();
 
-  #ifdef ESP32
-    timer = timerBegin(0, 80, true);
-    timerAttachInterrupt(timer, &display_updater, true);
-    timerAlarmWrite(timer, 4000, true);
-    timerAlarmEnable(timer);
-  #endif
+  //pinMode(25, INPUT);
+
+  //#ifdef ESP32
+  //  timer = timerBegin(0, 80, true);
+  //  timerAttachInterrupt(timer, &display_updater, true);
+  //  timerAlarmWrite(timer, 4000, true);
+  //  timerAlarmEnable(timer);
+  //#endif
 
   int i = 0;
   
@@ -89,6 +107,21 @@ Serial.begin(9600);
   valeurX = analogRead(joystick_X); 
   valeurY = analogRead(joystick_Y);
 }
+
+
+//void onConnectionEstablished()
+//{
+//  char *topic = "newplayer";
+//  client.publish(topic,Wifi.macAddress());
+//  client.subscrbe(Wifi.macAddress(), [](const String & payload){
+//    envoi = payload;
+//    global = payload;
+//    Serial.print("envoi : ");
+//    Serial.println(envoi);
+//    session = payload.substring(0,payload.indexOf(delimiter));
+//    id_joueur =  payload.substring(payload.indexOf(delimiter)+1,payload.
+//  }
+//}
 
 
 
@@ -200,8 +233,10 @@ ecran(); // Affichage de l'ecran
 
              if (valeurbouton == 0){
               collision(i);
+              Serial.println(m);
               if (m==5){
                 valider=true;
+                m=0;
               }else{
                 m=0;
               }
@@ -350,6 +385,11 @@ void ecran(){
   display.drawPixel(15, 16, myRED);*/
   for (int i=0; i < 5; i++){
     display.drawLine(bat[i][0], bat[i][1], bat[i][2], bat[i][3], myWHITE); 
+    //display.drawline(bat[i][0]-1, bat[i][1], bat[i][0]-1, bat[i][1]);
+    //display.drawline(bat[i][2]+1, bat[i][1]);
+    //display.drawline(bat[i][0]-1, bat[i][1]+1, bat[i][2]+1, bat[i][3]+1);
+    //display.drawline(bat[i][0]-1, bat[i][1]-1, bat[i][2]+1, bat[i][3]-1);
+    display.drawRect(bat[i][0]-1, bat[i][1]+1, 3, i, myORANGE);
   }      
 }
 void collision(int a){
@@ -357,26 +397,40 @@ void collision(int a){
     if (valeurnuke == 0){
       if (i == a){
         m++;
+        Serial.print("m:");
+        Serial.print(m);
       }else{
-        if (bat[i][0]-1 < pointX < pointX+bateaux[a] < bat[i][2]+1 || bat[i][1]-1 < pointY < bat[i][3]+1){
-            Serial.print("ligma balls");
-            //placement impossible  
-        } else {
-        Serial.print("Qu'est ce que sex ?");
-        valider=true;
-        m++;
-        }
+        if (bat[i][0]-1 <= pointX && pointX+bateaux[a] <=  bat[i][2]+1 && bat[i][1]-1 <= pointY <= bat[i][3]+1){
+            Serial.println("Placement impossible");
+            Serial.print("i:");
+            Serial.println(i);
+            //placement impossible
+        }else{
+          Serial.println("Placement possible");
+          Serial.print("i:");
+          Serial.println(i);
+          m++;
+          //placement possible
+          }
       }
       
     }else{
       if (i == a){
         m++;
+        Serial.print("m:");
+        Serial.print(m);
       }else{
-        if (bat[i][1] < pointY < pointY+bateaux[a] < bat[i][3] || bat[i][0] < pointX < bat[i][2]){
-            //placement impossible
+        if (bat[i][1]-1 < pointY && pointY+bateaux[a] < bat[i][3]+1 && bat[i][0]-1 < pointX < bat[i][2]+1){
+           Serial.println("Placement impossible");
+          Serial.print("i:");
+          Serial.println(i);
+          //placement impossible
         } else {
-          valider=true;
+          Serial.println("Placement possible");
+          Serial.print("i:");
+          Serial.println(i);
           m++;
+          //placement possible
         }
       }
     }
